@@ -57,8 +57,6 @@ class LoginWindow(QtGui.QWidget):
             self.father.show()
             return
         except Exception, e:
-            print e.message
-
             pass
         s.get("http://www.renren.com/SysHome.do")
         self.setWindowTitle("Login")
@@ -95,9 +93,8 @@ class LoginWindow(QtGui.QWidget):
             para = {"email": "%s" % str(self.input_username.text()), "password": "%s" % str(self.input_password.text()),
                     "icode": "%s" % str(self.input_cap.text()), "origURL": "http://www.renren.com/home",
                     "domain": "renren.com", "key_id": "1", "captcha_type": "web_login"}
-            print para
+            # print para
             res = s.post("http://www.renren.com/PLogin.do", data=para, headers=hd)
-            # ipython debug
             if res.history[0].content.find("failCode") != -1:
                 QtGui.QMessageBox.warning(self, "Error", "Wrong Password/username/captcha")
                 self.input_password.clear()
@@ -110,28 +107,10 @@ class LoginWindow(QtGui.QWidget):
                         cPickle.dump(s.cookies, f)
                 self.close()
                 self.father.show()
-                # self.parent().show()
-                # m.exec_()
-                # print "res"
-                # print res.history
-                # print res.history[0].content
-                # if len(res.history)!=2:
-                #     s.cookies.clear()
-                #     return False
-                # else:
-                #     print "Here"
-                #     self.close()
-                #     m=MainWindow()
-                #     m.show()
-                #     return True
+
 
 
 class MainWindow(QtGui.QWidget):
-    # friends={}
-    # fA=set()
-    # fB=set()
-    taskQueue = Queue()
-
     def __init__(self):
         super(QtGui.QWidget, self).__init__()
         self.setWindowTitle("RenrenCommandFriends")
@@ -144,7 +123,7 @@ class MainWindow(QtGui.QWidget):
         self.lay.addWidget(self.input_friendB)
         self.lay.addWidget(self.button_find)
         self.setLayout(self.lay)
-        self.hide()
+        # self.hide()
         self.login = LoginWindow(self)
 
 
