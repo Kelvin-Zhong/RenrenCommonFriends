@@ -16,7 +16,7 @@ import re
 from threading import Thread
 import json
 import cPickle
-from PyQt4 import QtGui, QtCore, QtWebKit, QtNetwork
+from PyQt4 import QtGui, QtCore
 import requests
 from bs4 import BeautifulSoup
 
@@ -114,14 +114,15 @@ class MainWindow(QtGui.QWidget):
     def __init__(self):
         super(QtGui.QWidget, self).__init__()
         self.setWindowTitle("RenrenCommandFriends")
+        self.resize(640,480)
         self.input_friendA = QtGui.QLineEdit()
         self.input_friendB = QtGui.QLineEdit()
         self.button_find = QtGui.QPushButton(u"Start")
         self.button_find.clicked.connect(self.work)
         self.lay = QtGui.QGridLayout()
-        self.lay.addWidget(self.input_friendA)
-        self.lay.addWidget(self.input_friendB)
-        self.lay.addWidget(self.button_find)
+        self.lay.addWidget(self.input_friendA,0,0)
+        self.lay.addWidget(self.input_friendB,0,2)
+        self.lay.addWidget(self.button_find,0,1)
         self.setLayout(self.lay)
         # self.hide()
         self.login = LoginWindow(self)
