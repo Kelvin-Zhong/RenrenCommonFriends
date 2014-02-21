@@ -38,7 +38,7 @@ s = requests.Session()
 
 class ClickableLabel(QtGui.QLabel):
     def __init__(self):
-        super(QtGui.QLabel, self).__init__()
+        super(ClickableLabel, self).__init__()
         self.show_cap()
 
     def mousePressEvent(self, QMouseEvent):
@@ -52,7 +52,7 @@ class ClickableLabel(QtGui.QLabel):
 
 class LoginWindow(QtGui.QWidget):
     def __init__(self, father=None):
-        super(QtGui.QWidget, self).__init__()
+        super(LoginWindow, self).__init__()
         self.father = father
         try:
             s.cookies = cPickle.load(open("./cookie", "rb"))
@@ -60,7 +60,7 @@ class LoginWindow(QtGui.QWidget):
             if content.history==[]:
                 QtGui.QMessageBox.warning(self,"Warning","Cookie is expired,Please relogin")
                 try:
-                    os.remove("/.cookie")
+                    os.remove("./cookie")
                 except:
                     pass
             # print s.cookies.get_dict()
@@ -127,7 +127,7 @@ class LoginWindow(QtGui.QWidget):
 
 class MainWindow(QtGui.QWidget):
     def __init__(self):
-        super(QtGui.QWidget, self).__init__()
+        super(MainWindow, self).__init__()
 
         self.login = LoginWindow(self)
 
@@ -189,7 +189,6 @@ class MainWindow(QtGui.QWidget):
 
     def display(self, json_str):
         f = json.loads(str(json_str))
-        self.friendlistlayout
         for (k, v) in f.items():
             self.temp = QtGui.QLabel("<a href='http://www.renren.com/%s'>" % k + v[u"name"] + "</a>")
             self.temp.setOpenExternalLinks(True)
