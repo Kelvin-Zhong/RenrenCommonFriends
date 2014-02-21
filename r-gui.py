@@ -130,10 +130,12 @@ class MainWindow(QtGui.QWidget):
         super(QtGui.QWidget, self).__init__()
 
         self.login = LoginWindow(self)
-        self.rid=self.login.rid
-        self.gw=GetFriendWorker(self.rid)
-        self.gw.start()
-        self.connect(self.gw,QtCore.SIGNAL("retFriend(QString)"),self.appendFriends)
+
+        #temparorily remove friendlist functions
+        # self.rid=self.login.rid
+        # self.gw=GetFriendWorker(self.rid)
+        # self.gw.start()
+        # self.connect(self.gw,QtCore.SIGNAL("retFriend(QString)"),self.appendFriends)
 
         self.setWindowTitle("RenrenCommandFriends")
         self.resize(640,480)
