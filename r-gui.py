@@ -3,14 +3,18 @@
 
 #feature to add
 #todo:2 check login  done 
-#todo 6:store pass?or store cookie
-#todo:1 add get friendlist(name,etc) from login
+#todo 6:store pass?or store cookie almost done
+#todo:1 add get friendlist(name,etc) from login need yours id almost done
+#todo:5 onclick label goto browser almost done
+#to fix:1 when adding combobox item ,gui react slow.
+#to fix:2 when serach for the second time,the previous result haven't been removed.
 #todo:3 support more than 2
 #todo:4 add waiting indicator
-#todo:5 onclick label goto browser
+#todo:7 improve the interface
 #http://www.cells.es/Members/srubio/howto/pyqt
 
 import sys
+import os
 from Queue import Queue
 import re
 from threading import Thread
@@ -20,7 +24,6 @@ from PyQt4 import QtGui, QtCore
 import requests
 from bs4 import BeautifulSoup
 
-result1 = str()
 
 hd = {'Host': 'www.renren.com', 'Connection': 'keep-alive', 'Cache-Control': 'max-age=0',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -52,11 +55,20 @@ class LoginWindow(QtGui.QWidget):
         self.father = father
         try:
             s.cookies = cPickle.load(open("./cookie", "rb"))
-            s.get("http://www.renren.com")
+            content=s.get("http://www.renren.com")
+            if content.history==[]:
+                QtGui.QMessageBox.warning(self,"Warning","Cookie is expired,Please relogin")
+                try:
+                    os.remove("/.cookie")
+                except:
+                    pass
             # print s.cookies.get_dict()
-            self.father.show()
+            else:
+                self.rid=s.cookies.get("id")
+                self.father.show()
             return
         except Exception, e:
+            print e.message
             pass
         s.get("http://www.renren.com/SysHome.do")
         self.setWindowTitle("Login")
@@ -102,6 +114,7 @@ class LoginWindow(QtGui.QWidget):
                 self.cap.show_cap()
                 return False
             else:
+                self.rid=s.cookies.get("id")
                 if self.button_remember.checkState() != 0:
                     with open("./cookie", "wb") as f:
                         cPickle.dump(s.cookies, f)
@@ -110,40 +123,122 @@ class LoginWindow(QtGui.QWidget):
 
 
 
+
 class MainWindow(QtGui.QWidget):
     def __init__(self):
         super(QtGui.QWidget, self).__init__()
+
+        self.login = LoginWindow(self)
+        self.rid=self.login.rid
+        self.gw=GetFriendWorker(self.rid)
+        self.gw.start()
+        self.connect(self.gw,QtCore.SIGNAL("retFriend(QString)"),self.appendFriends)
+
         self.setWindowTitle("RenrenCommandFriends")
         self.resize(640,480)
+        self.select_friendA=QtGui.QComboBox()
+        self.select_friendB=QtGui.QComboBox()
         self.input_friendA = QtGui.QLineEdit()
         self.input_friendB = QtGui.QLineEdit()
+        self.select_friendA.setLineEdit(self.input_friendA)
+        self.select_friendB.setLineEdit(self.input_friendB)
+        self.select_friendA.addItem("",QtCore.QVariant())
+        self.select_friendB.addItem("",QtCore.QVariant())
         self.button_find = QtGui.QPushButton(u"Start")
-        self.button_find.clicked.connect(self.work)
+        self.button_find.clicked.connect(self.start)
         self.lay = QtGui.QGridLayout()
-        self.lay.addWidget(self.input_friendA,0,0)
-        self.lay.addWidget(self.input_friendB,0,2)
+        self.lay.addWidget(self.select_friendA,0,0)
+        self.lay.addWidget(self.select_friendB,0,3)
         self.lay.addWidget(self.button_find,0,1)
+        self.friendlistlayout=QtGui.QGridLayout()
+        self.lay.addLayout(self.friendlistlayout,1,0)
         self.setLayout(self.lay)
         # self.hide()
-        self.login = LoginWindow(self)
 
 
-    def work(self):
+
+
+
+    def appendFriends(self,json_str):
+        f=json.loads(str(json_str))
+        for (k,v) in f.items():
+            self.select_friendA.addItem(v[u"name"],QtCore.QVariant(k))
+            self.select_friendB.addItem(v[u"name"],QtCore.QVariant(k))
+        pass
+
+    def start(self):
         if self.input_friendA.text().isEmpty() and self.input_friendA.text().isEmpty():
             QtGui.QMessageBox.warning(self, "Warning", "Input two friends")
             return False
         else:
-            self.w = RenrenWorker(self.input_friendA.text(), self.input_friendB.text(), self)
+            if self.select_friendA.currentIndex()>0:
+                self.fA=self.select_friendA.itemData(self.select_friendA.currentIndex()).toString()
+            else:
+                self.fA=self.input_friendA.text()
+
+            if self.select_friendB.currentIndex()>0:
+                self.fB=self.select_friendB.itemData(self.select_friendB.currentIndex()).toString()
+            else:
+                self.fB=self.input_friendB.text()
+            self.w = RenrenWorker(self.fA,self.fB, self)
             self.w.start()
             self.connect(self.w, QtCore.SIGNAL("ret(QString)"), self.display)
 
     def display(self, json_str):
         f = json.loads(str(json_str))
+        self.friendlistlayout
         for (k, v) in f.items():
             self.temp = QtGui.QLabel("<a href='http://www.renren.com/%s'>" % k + v[u"name"] + "</a>")
             self.temp.setOpenExternalLinks(True)
-            self.lay.addWidget(self.temp)
+            self.friendlistlayout.addWidget(self.temp)
+            self.temp=QtGui.QLabel()
+            img = QtGui.QPixmap()
+            img.loadFromData(s.get(v[u"avatar"]).content)
+            self.temp.setPixmap(img)
+            self.friendlistlayout.addWidget(self.temp)
+
         pass
+
+
+class GetFriendWorker(QtCore.QThread):
+    queue=Queue()
+    def __init__(self,rid):
+        super(QtCore.QThread,self).__init__()
+        self.rid=rid
+        pages=RenrenWorker.get_page_num(self.rid)
+        for i in range(pages):
+            self.queue.put(i)
+        pass
+
+    def run(self):
+        for i in range(5):
+            t = Thread(target=self.worker)
+            t.setDaemon(True)
+            t.start()
+        self.queue.join()
+        pass
+
+    def worker(self):
+        while True:
+            arg = self.queue.get()
+            self.get_friend_info(arg)
+            self.queue.task_done()
+
+    def get_friend_info(self,arg):
+        r = s.get("http://friend.renren.com/GetFriendList.do?curpage=%d&id=%s" % (arg, self.rid))
+        soup = BeautifulSoup(r.content)
+        fs = soup.find(id="friendListCon")
+        if fs.string == u'\n':
+            return
+        for i in fs.children:
+            if i == "\n":
+                continue
+            rid = i.p.a['href'].split("=")[1]
+            pic = i.p.a.img.attrs['src']
+            name = i.div.dl.dd.text.encode("utf-8")
+            self.emit(QtCore.SIGNAL("retFriend(QString)"),json.dumps({rid:{"avatar": pic, "name": name}}))
+
+
 
 
 class RenrenWorker(QtCore.QThread):
@@ -159,7 +254,8 @@ class RenrenWorker(QtCore.QThread):
         self.fB_rid = f_b
         try:
             fA_page, fB_page = self.get_page_num(self.fA_rid), self.get_page_num(self.fB_rid)
-        except:
+        except Exception,e:
+            print e.message
             QtGui.QMessageBox.warning(parent, "Error", u"出错了OOPS！")
             self.terminate()
             return
@@ -169,11 +265,10 @@ class RenrenWorker(QtCore.QThread):
             self.taskQueue.put([self.fB_rid, i, self.fB])
         pass
 
-
-    def get_page_num(self, rid):
+    @staticmethod
+    def get_page_num(rid):
         return max(map(int, re.findall(r"GetFriendList\.do\?curpage=(\d*)", s.get(
             "http://friend.renren.com/GetFriendList.do?curpage=0&id=%s" % rid).content))) + 1
-
 
     def get_friend_info(self, rid, page, f_set):
         r = s.get("http://friend.renren.com/GetFriendList.do?curpage=%d&id=%s" % (page, rid))
