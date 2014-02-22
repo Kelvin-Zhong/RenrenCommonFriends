@@ -4,19 +4,19 @@ __author__ = 'jackyzy823'
 
 
 #feature to add
-#todo:2 check login  done
-#todo 6:store pass?or store cookie almost done
-#todo:1 add get friendlist(name,etc) from login need yours id almost done
-#todo:5 onclick label goto browser almost done
-#to fix:1 when adding combobox item ,gui react slow.
+#todo:7 improve the interface
 #to fix:2 when serach for the second time,the previous result haven't been removed.
+#todo:#9 change old style connect/emit/signal/slot to python-style decorator style pySignal(dict)
+#todo:4 add waiting indicator
+#to fix:1 when adding combobox item ,gui react slow.
+#todo:5 onclick label goto browser almost done
+#todo:1 add get friendlist(name,etc) from login need yours id almost done
+#todo:3 support more than 2
+#todo:#8 add autocomplete  almost done
+#todo 6:store pass?or store cookie almost done
+#todo:2 check login  done
 #to fix:#3 logical fault about rid may need block before Mainwindow after login window  =>change rid logic to mainwindow
 #fixed #3:refactory the gui logic use dialog to login and solved in r-refactory
-#todo:3 support more than 2
-#todo:4 add waiting indicator
-#todo:7 improve the interface
-#todo:#8 add autocomplete  almost done
-#todo:#9 change old style connect/emit/signal/slot to python-style decorator style pySignal(dict)
 #http://www.cells.es/Members/srubio/howto/pyqt
 
 import sys
@@ -148,6 +148,7 @@ class MainWindow(QtGui.QWidget):
         self.select_friendA.addItem("",QtCore.QVariant())
         self.select_friendB.addItem("",QtCore.QVariant())
         self.button_find = QtGui.QPushButton(u"Start")
+        self.button_find.setShortcut(QtGui.QKeySequence.InsertParagraphSeparator)
         self.button_find.clicked.connect(self.start)
         self.lay = QtGui.QGridLayout()
         self.lay.addWidget(self.select_friendA,0,0)
