@@ -15,6 +15,8 @@ __author__ = 'jackyzy823'
 #todo:3 support more than 2
 #todo:4 add waiting indicator
 #todo:7 improve the interface
+#todo:#8 add autocomplete  almost done
+#todo:#9 change old style connect/emit/signal/slot to python-style decorator style pySignal(dict)
 #http://www.cells.es/Members/srubio/howto/pyqt
 
 import sys
