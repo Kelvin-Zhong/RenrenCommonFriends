@@ -132,6 +132,10 @@ class MainWindow(QtGui.QWidget):
         self.select_friendA.setLineEdit(self.input_friendA)
         self.select_friendB.setLineEdit(self.input_friendB)
 
+
+        self.select_friendA.completer().setCompletionMode(QtGui.QCompleter.PopupCompletion)
+        self.select_friendB.completer().setCompletionMode(QtGui.QCompleter.PopupCompletion)
+
         self.select_friendA.addItem("",QtCore.QVariant())
         self.select_friendB.addItem("",QtCore.QVariant())
         self.button_find = QtGui.QPushButton(u"Start")
@@ -147,16 +151,16 @@ class MainWindow(QtGui.QWidget):
         self.gw=GetFriendWorker(self.rid)
         self.gw.start()
         self.connect(self.gw,QtCore.SIGNAL("retFriend(QString)"),self.appendFriends)
-        self.connect(self.gw,QtCore.SIGNAL("newCompleter(QStringList)"),self.createCompleter)
+        # self.connect(self.gw,QtCore.SIGNAL("newCompleter(QStringList)"),self.createCompleter)
         self.show()
 
-    def createCompleter(self,comp_list):
-        print "IN comp"
-        self.completer=QtGui.QCompleter(comp_list)
-        self.completer.setCompletionMode(QtGui.QCompleter.PopupCompletion)
-        self.select_friendA.setCompleter(self.completer)
-        self.select_friendB.setCompleter(self.completer)
-        pass
+    # def createCompleter(self,comp_list):
+    #     print "IN comp"
+    #     self.completer=QtGui.QCompleter(comp_list)
+    #     self.completer.setCompletionMode(QtGui.QCompleter.PopupCompletion)
+    #     self.select_friendA.setCompleter(self.completer)
+    #     self.select_friendB.setCompleter(self.completer)
+    #     pass
 
     def appendFriends(self,json_str):
         f=json.loads(str(json_str))
@@ -201,7 +205,7 @@ class MainWindow(QtGui.QWidget):
 
 class GetFriendWorker(QtCore.QThread):
     queue=Queue()
-    names=QtCore.QStringList()
+    # names=QtCore.QStringList()
     def __init__(self,rid):
         super(QtCore.QThread,self).__init__()
         self.rid=rid
@@ -216,7 +220,7 @@ class GetFriendWorker(QtCore.QThread):
             t.setDaemon(True)
             t.start()
         self.queue.join()
-        self.emit(QtCore.SIGNAL("newCompleter(QStringList)"),self.names)
+        # self.emit(QtCore.SIGNAL("newCompleter(QStringList)"),self.names)
         pass
 
     def worker(self):
@@ -237,7 +241,7 @@ class GetFriendWorker(QtCore.QThread):
             rid = i.p.a['href'].split("=")[1]
             pic = i.p.a.img.attrs['src']
             name = i.div.dl.dd.text.encode("utf-8")
-            self.names.append(name.decode("utf-8"))
+            # self.names.append(name.decode("utf-8"))
             self.emit(QtCore.SIGNAL("retFriend(QString)"),json.dumps({rid:{"avatar": pic, "name": name}}))
 
 
