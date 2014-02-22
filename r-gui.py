@@ -8,7 +8,7 @@
 #todo:5 onclick label goto browser almost done
 #to fix:1 when adding combobox item ,gui react slow.
 #to fix:2 when serach for the second time,the previous result haven't been removed.
-#to fix:3 logical fault about rid may need block before Mainwindow after login window
+#to fix:3 logical fault about rid may need block before Mainwindow after login window  =>change rid logic to mainwindow
 #todo:3 support more than 2
 #todo:4 add waiting indicator
 #todo:7 improve the interface
