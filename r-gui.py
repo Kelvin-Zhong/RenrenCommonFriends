@@ -201,6 +201,12 @@ class MainWindow(QtGui.QWidget):
 
         pass
 
+    #self.connect(self,signal("xxx"),self.newComp)
+    def newComplte(self,qlist):
+        self.complter=QtGui.QCompleter(qlist)
+        self.select_friendA.setCompleter(self.complter)
+        self.select_friendB.setCompleter(self.complter)
+
 
 class GetFriendWorker(QtCore.QThread):
     queue=Queue()
@@ -218,6 +224,8 @@ class GetFriendWorker(QtCore.QThread):
             t.setDaemon(True)
             t.start()
         self.queue.join()
+
+        # self. emit(signal(newComplete(Stringlist),...))
         pass
 
     def worker(self):
