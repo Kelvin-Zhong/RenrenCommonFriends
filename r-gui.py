@@ -53,6 +53,7 @@ class ClickableLabel(QtGui.QLabel):
 class LoginWindow(QtGui.QWidget):
     def __init__(self, father=None):
         super(LoginWindow, self).__init__()
+        self.setWindowIcon(QtGui.QIcon(""))
         self.father = father
         try:
             s.cookies = cPickle.load(open("./cookie", "rb"))
@@ -322,5 +323,4 @@ class RenrenWorker(QtCore.QThread):
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     m = MainWindow()
-
     sys.exit(app.exec_())
