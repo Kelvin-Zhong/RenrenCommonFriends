@@ -9,7 +9,7 @@ A GUI-tools to help you to find common friends of your two or more friends
     -   require [requests](http://docs.python-requests.org/en/latest/) `apt-get install python-requests`  or `pip install requests`
 
 Cautions and Notes:
-#1.All opeartion uses simulated login and fetching pages.
-#2.Under the situation that this tools  DO NOT have renren api,it could be very slow because fetching pages needs lots of time.
-#3.So,if the interface have not react ,please wait patiently.
-#4.it's just a practice for learning Python , Qt and Basic Http .
+1.All opeartion uses simulated login and fetching pages.
+2.Under the situation that this tools  DO NOT have renren api,it could be very slow because fetching pages needs lots of time.
+3.So,if the interface have not react ,please wait patiently.
+4.it's just a practice for learning Python , Qt and Basic Http .
