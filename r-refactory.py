@@ -136,6 +136,11 @@ class MainWindow(QtGui.QWidget):
         self.select_friendA.completer().setCompletionMode(QtGui.QCompleter.PopupCompletion)
         self.select_friendB.completer().setCompletionMode(QtGui.QCompleter.PopupCompletion)
 
+
+        #only affect once
+        # self.select_friendA.view().setLayoutMode(1)
+        # self.select_friendA.view().setBatchSize(10)
+
         self.select_friendA.addItem("",QtCore.QVariant())
         self.select_friendB.addItem("",QtCore.QVariant())
         self.button_find = QtGui.QPushButton(u"Start")
