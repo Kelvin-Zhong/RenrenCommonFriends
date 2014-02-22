@@ -48,7 +48,8 @@ class LoginDialog(QtGui.QDialog):
         self.parent=parent
         super(LoginDialog,self).__init__(parent)
         s.get("http://www.renren.com/SysHome.do")
-        self.setWindowTitle("Login")
+        self.setWindowIcon(QtGui.QIcon("./icon.png"))
+        self.setWindowTitle(u"登陆")
         self.resize(204, 100)
         self.input_username = QtGui.QLineEdit()
         self.input_password = QtGui.QLineEdit()
@@ -124,6 +125,7 @@ class MainWindow(QtGui.QWidget):
         #
 
         self.setWindowTitle("RenrenCommandFriends")
+        self.setWindowIcon(QtGui.QIcon("./icon.png"))
         self.resize(640,480)
         self.select_friendA=QtGui.QComboBox()
         self.select_friendB=QtGui.QComboBox()
@@ -245,7 +247,7 @@ class GetFriendWorker(QtCore.QThread):
                 continue
             rid = i.p.a['href'].split("=")[1]
             pic = i.p.a.img.attrs['src']
-            name = i.div.dl.dd.text.encode("utf-8")
+            name = i.div.dl.dd.text.rstrip().encode("utf-8")
             # self.names.append(name.decode("utf-8"))
             self.emit(QtCore.SIGNAL("retFriend(QString)"),json.dumps({rid:{"avatar": pic, "name": name}}))
 
@@ -293,7 +295,7 @@ class RenrenWorker(QtCore.QThread):
             rid = i.p.a['href'].split("=")[1]
             f_set.add(rid)
             pic = i.p.a.img.attrs['src']
-            name = i.div.dl.dd.text.encode("utf-8")
+            name = i.div.dl.dd.text.rstrip().encode("utf-8")
             self.friends[rid] = {"avatar": pic, "name": name}
 
     def worker(self):
