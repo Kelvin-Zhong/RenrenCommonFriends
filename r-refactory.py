@@ -46,9 +46,9 @@ class ClickableLabel(QtGui.QLabel):
 
 
 class LoginDialog(QtGui.QDialog):
-    def __init__(self,parent):
-        self.parent=parent
-        super(LoginDialog,self).__init__(parent)
+    def __init__(self, parent):
+        self.parent = parent
+        super(LoginDialog, self).__init__(parent)
         s.get("http://www.renren.com/SysHome.do")
         self.setWindowIcon(QtGui.QIcon("./icon.png"))
         self.setWindowTitle(u"登陆")
@@ -92,7 +92,7 @@ class LoginDialog(QtGui.QDialog):
                 self.cap.show_cap()
                 return False
             else:
-                self.parent.rid=s.cookies.get("id")
+                self.parent.rid = s.cookies.get("id")
                 if self.button_remember.checkState() != 0:
                     with open("./cookie", "wb") as f:
                         cPickle.dump(s.cookies, f)
@@ -100,42 +100,40 @@ class LoginDialog(QtGui.QDialog):
         pass
 
 
-
 class MainWindow(QtGui.QWidget):
     def __init__(self):
-        super(MainWindow,self).__init__()
+        super(MainWindow, self).__init__()
 
         #login and rid logic
-        self.login=LoginDialog(self)
-        self.needlogin=False
+        self.login = LoginDialog(self)
+        self.needlogin = False
         if os.path.exists("./cookie"):
             s.cookies = cPickle.load(open("./cookie", "rb"))
-            content=s.get("http://www.renren.com")
-            if content.history==[]:
-                QtGui.QMessageBox.warning(self,"Warning","Cookie is expired,Please relogin")
+            content = s.get("http://www.renren.com")
+            if content.history == []:
+                QtGui.QMessageBox.warning(self, "Warning", "Cookie is expired,Please relogin")
                 os.remove("./cookie")
-                self.needlogin=True
+                self.needlogin = True
             else:
-                self.rid=s.cookies.get("id")
+                self.rid = s.cookies.get("id")
         else:
-            self.needlogin=True
+            self.needlogin = True
             pass
-        if self.needlogin==True:
-            if self.login.exec_()==QtGui.QDialog.Accepted:
+        if self.needlogin == True:
+            if self.login.exec_() == QtGui.QDialog.Accepted:
                 #use dialog modal to block the process
                 pass
         #
 
         self.setWindowTitle("RenrenCommandFriends")
         self.setWindowIcon(QtGui.QIcon("./icon.png"))
-        self.resize(640,480)
-        self.select_friendA=QtGui.QComboBox()
-        self.select_friendB=QtGui.QComboBox()
+        self.resize(640, 480)
+        self.select_friendA = QtGui.QComboBox()
+        self.select_friendB = QtGui.QComboBox()
         self.input_friendA = QtGui.QLineEdit()
         self.input_friendB = QtGui.QLineEdit()
         self.select_friendA.setLineEdit(self.input_friendA)
         self.select_friendB.setLineEdit(self.input_friendB)
-
 
         self.select_friendA.completer().setCompletionMode(QtGui.QCompleter.PopupCompletion)
         self.select_friendB.completer().setCompletionMode(QtGui.QCompleter.PopupCompletion)
@@ -145,22 +143,22 @@ class MainWindow(QtGui.QWidget):
         # self.select_friendA.view().setLayoutMode(1)
         # self.select_friendA.view().setBatchSize(10)
 
-        self.select_friendA.addItem("",QtCore.QVariant())
-        self.select_friendB.addItem("",QtCore.QVariant())
+        self.select_friendA.addItem("", QtCore.QVariant())
+        self.select_friendB.addItem("", QtCore.QVariant())
         self.button_find = QtGui.QPushButton(u"Start")
         self.button_find.setShortcut(QtGui.QKeySequence.InsertParagraphSeparator)
         self.button_find.clicked.connect(self.start)
         self.lay = QtGui.QGridLayout()
-        self.lay.addWidget(self.select_friendA,0,0)
-        self.lay.addWidget(self.select_friendB,0,3)
-        self.lay.addWidget(self.button_find,0,1)
-        self.friendlistlayout=QtGui.QGridLayout()
-        self.lay.addLayout(self.friendlistlayout,1,0)
+        self.lay.addWidget(self.select_friendA, 0, 0)
+        self.lay.addWidget(self.select_friendB, 0, 3)
+        self.lay.addWidget(self.button_find, 0, 1)
+        self.friendlistlayout = QtGui.QGridLayout()
+        self.lay.addLayout(self.friendlistlayout, 1, 0)
         self.setLayout(self.lay)
         # self.rid=self.login.rid
-        self.gw=GetFriendWorker(self.rid)
+        self.gw = GetFriendWorker(self.rid)
         self.gw.start()
-        self.connect(self.gw,QtCore.SIGNAL("retFriend(QString)"),self.appendFriends)
+        self.connect(self.gw, QtCore.SIGNAL("retFriend(QString)"), self.appendFriends)
         # self.connect(self.gw,QtCore.SIGNAL("newCompleter(QStringList)"),self.createCompleter)
         self.show()
 
@@ -172,11 +170,11 @@ class MainWindow(QtGui.QWidget):
     #     self.select_friendB.setCompleter(self.completer)
     #     pass
 
-    def appendFriends(self,json_str):
-        f=json.loads(str(json_str))
-        for (k,v) in f.items():
-            self.select_friendA.addItem(v[u"name"],QtCore.QVariant(k))
-            self.select_friendB.addItem(v[u"name"],QtCore.QVariant(k))
+    def appendFriends(self, json_str):
+        f = json.loads(str(json_str))
+        for (k, v) in f.items():
+            self.select_friendA.addItem(v[u"name"], QtCore.QVariant(k))
+            self.select_friendB.addItem(v[u"name"], QtCore.QVariant(k))
         pass
 
     def start(self):
@@ -184,16 +182,16 @@ class MainWindow(QtGui.QWidget):
             QtGui.QMessageBox.warning(self, "Warning", "Input two friends")
             return False
         else:
-            if self.select_friendA.currentIndex()>0:
-                self.fA=self.select_friendA.itemData(self.select_friendA.currentIndex()).toString()
+            if self.select_friendA.currentIndex() > 0:
+                self.fA = self.select_friendA.itemData(self.select_friendA.currentIndex()).toString()
             else:
-                self.fA=self.input_friendA.text()
+                self.fA = self.input_friendA.text()
 
-            if self.select_friendB.currentIndex()>0:
-                self.fB=self.select_friendB.itemData(self.select_friendB.currentIndex()).toString()
+            if self.select_friendB.currentIndex() > 0:
+                self.fB = self.select_friendB.itemData(self.select_friendB.currentIndex()).toString()
             else:
-                self.fB=self.input_friendB.text()
-            self.w = RenrenWorker(self.fA,self.fB, self)
+                self.fB = self.input_friendB.text()
+            self.w = RenrenWorker(self.fA, self.fB, self)
             self.w.start()
             self.connect(self.w, QtCore.SIGNAL("ret(QString)"), self.display)
 
@@ -203,7 +201,7 @@ class MainWindow(QtGui.QWidget):
             self.temp = QtGui.QLabel("<a href='http://www.renren.com/%s'>" % k + v[u"name"] + "</a>")
             self.temp.setOpenExternalLinks(True)
             self.friendlistlayout.addWidget(self.temp)
-            self.temp=QtGui.QLabel()
+            self.temp = QtGui.QLabel()
             img = QtGui.QPixmap()
             img.loadFromData(s.get(v[u"avatar"]).content)
             self.temp.setPixmap(img)
@@ -212,14 +210,13 @@ class MainWindow(QtGui.QWidget):
         pass
 
 
-
 class GetFriendWorker(QtCore.QThread):
-    queue=Queue()
+    queue = Queue()
     # names=QtCore.QStringList()
-    def __init__(self,rid):
-        super(QtCore.QThread,self).__init__()
-        self.rid=rid
-        pages=RenrenWorker.get_page_num(self.rid)
+    def __init__(self, rid):
+        super(QtCore.QThread, self).__init__()
+        self.rid = rid
+        pages = RenrenWorker.get_page_num(self.rid)
         for i in range(pages):
             self.queue.put(i)
         pass
@@ -239,7 +236,7 @@ class GetFriendWorker(QtCore.QThread):
             self.get_friend_info(arg)
             self.queue.task_done()
 
-    def get_friend_info(self,arg):
+    def get_friend_info(self, arg):
         r = s.get("http://friend.renren.com/GetFriendList.do?curpage=%d&id=%s" % (arg, self.rid))
         soup = BeautifulSoup(r.content)
         fs = soup.find(id="friendListCon")
@@ -252,9 +249,7 @@ class GetFriendWorker(QtCore.QThread):
             pic = i.p.a.img.attrs['src']
             name = i.div.dl.dd.text.rstrip().encode("utf-8")
             # self.names.append(name.decode("utf-8"))
-            self.emit(QtCore.SIGNAL("retFriend(QString)"),json.dumps({rid:{"avatar": pic, "name": name}}))
-
-
+            self.emit(QtCore.SIGNAL("retFriend(QString)"), json.dumps({rid: {"avatar": pic, "name": name}}))
 
 
 class RenrenWorker(QtCore.QThread):
@@ -270,7 +265,7 @@ class RenrenWorker(QtCore.QThread):
         self.fB_rid = f_b
         try:
             fA_page, fB_page = self.get_page_num(self.fA_rid), self.get_page_num(self.fB_rid)
-        except Exception,e:
+        except Exception, e:
             print e.message
             QtGui.QMessageBox.warning(parent, "Error", u"出错了OOPS！")
             self.terminate()
@@ -325,7 +320,6 @@ class RenrenWorker(QtCore.QThread):
         self.wait()
 
 
-
 hd = {'Host': 'www.renren.com', 'Connection': 'keep-alive', 'Cache-Control': 'max-age=0',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
       'Origin': 'http://www.renren.com',
@@ -333,12 +327,10 @@ hd = {'Host': 'www.renren.com', 'Connection': 'keep-alive', 'Cache-Control': 'ma
       'Content-Type': 'application/x-www-form-urlencoded', 'Referer': 'http://www.renren.com/SysHome.do',
       'Accept-Encoding': 'gzip,deflate,sdch', 'Accept-Language': 'zh-CN,zh;q=0.8,en;q=0.6'}
 
-s=requests.session()
+s = requests.session()
 
-
-if __name__=="__main__":
-
-    app=QtGui.QApplication(sys.argv)
-    m=MainWindow()
+if __name__ == "__main__":
+    app = QtGui.QApplication(sys.argv)
+    m = MainWindow()
 
     sys.exit(app.exec_())
