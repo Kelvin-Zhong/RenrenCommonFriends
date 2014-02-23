@@ -50,7 +50,7 @@ class LoginDialog(QtGui.QDialog):
         self.parent = parent
         super(LoginDialog, self).__init__(parent)
         s.get("http://www.renren.com/SysHome.do")
-        self.setWindowIcon(QtGui.QIcon("./icon.png"))
+        # self.setWindowIcon(QtGui.QIcon("./icon.png"))
         self.setWindowTitle(u"登陆")
         self.resize(204, 100)
         self.input_username = QtGui.QLineEdit()
